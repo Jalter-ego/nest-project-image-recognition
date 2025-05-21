@@ -20,7 +20,7 @@ export class OrganizationsService {
   findAllByUser(email: string,isActive:boolean) {
     return this.prismaService.organization.findMany({
       where: {
-        hostUser:email
+        hostUser: email
       },
       include:{
         subscriptions:{

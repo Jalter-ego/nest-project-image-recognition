@@ -93,6 +93,7 @@ model Patient {
   organization   Organization         @relation(fields: [organizationId], references: [id])
   consultations  Consultation[]
   appointments   MedicalAppointment[]
+  @@unique([organizationId, ci])
 }
 
 model AttentionHour {
@@ -115,8 +116,7 @@ model AttentionHourUser {
 
 model MedicalAppointment {
   id              String       @id @default(cuid())
-  appointmentDate DateTime
-  appointmentTime DateTime
+  appointmentDateTime DateTime
   patientId       String
   organizationId  String
   patient         Patient      @relation(fields: [patientId], references: [id])
