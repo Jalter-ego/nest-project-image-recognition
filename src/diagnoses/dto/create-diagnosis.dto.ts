@@ -9,8 +9,5 @@ export class CreateDiagnosisDto {
     description:string
     @IsString()
     @IsNotEmpty()
-    patientId:string
-    @IsString()
-    @IsNotEmpty()
     organizationId:string
 }
