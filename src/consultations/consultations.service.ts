@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateConsultationDto, CreateDiagnosisToConsultationDto, CreateTreatmentToConsultationDto } from './dto/create-consultation.dto';
 import { UpdateConsultationDto } from './dto/update-consultation.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -7,7 +7,30 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ConsultationsService {
   constructor(private prismaService: PrismaService) {}
 
-  create(createConsultationDto: CreateConsultationDto) {
+  async create(createConsultationDto: CreateConsultationDto) {
+    const user = await this.prismaService.user.findFirst({
+      where:{
+        id:createConsultationDto.userId
+      }
+    })
+    if(!user)
+      throw new NotFoundException("User not exist")
+
+    const patient = await this.prismaService.patient.findFirst({
+      where:{
+        id:createConsultationDto.patientId
+      }
+    })
+    if(!patient)
+      throw new NotFoundException("patient not exist")
+    const organization = await this.prismaService.organization.findFirst({
+      where:{
+        id:createConsultationDto.organizationId
+      }
+    })
+    if(!organization)
+      throw new NotFoundException("organization not exist")
+
     return this.prismaService.consultation.create({
       data:createConsultationDto
     });
