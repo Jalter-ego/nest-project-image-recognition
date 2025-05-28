@@ -55,6 +55,48 @@ export class ConsultationsService {
     return this.prismaService.consultation.findMany({
       where:{
         organizationId:id
+      },
+      omit:{
+        patientId:true,
+        organizationId:true,
+        userId:true
+      },
+      include:{
+        treatments:{
+          omit:{
+            consultationId:true,
+            treatmentId:true
+          },
+          include:{
+            treatment:true
+          }
+        },
+        diagnoses:{
+          omit:{
+            consultationId:true,
+            diagnosisId:true
+          },
+          include:{
+            diagnosis:true
+          }   
+        },
+        patient:{
+          select:{
+            id: true,
+            name: true,
+            aPaternal: true,
+            aMaternal: true,
+            ci: true,
+            sexo: true,
+            birthDate: true
+          }
+        },
+        user:{
+          select:{
+            id:true,
+            email:true
+          }
+        }
       }
     })
   }
