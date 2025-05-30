@@ -138,9 +138,17 @@ model Treatment {
   description    String
   duration       String
   instructions   String
+  frequencyValue Int?                   
+  frequencyUnit  FrequencyUnit? 
   organizationId String
   organization   Organization            @relation(fields: [organizationId], references: [id])
   consultations  ConsultationTreatment[]
+}
+
+enum FrequencyUnit {
+  daily
+  weekly
+  monthly
 }
 
 model Consultation {
