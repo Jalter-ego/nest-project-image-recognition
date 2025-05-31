@@ -14,6 +14,8 @@ import { TreatmentsModule } from './treatments/treatments.module';
 import { ConsultationsModule } from './consultations/consultations.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { AttentionHourModule } from './attention-hour/attention-hour.module';
+import { ReportsModule } from './reports/reports.module';
+import { PrinterModule } from './printer/printer.module';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { AttentionHourModule } from './attention-hour/attention-hour.module';
     ConsultationsModule,
     SubscriptionsModule,
     AttentionHourModule,
+    ReportsModule,
+    PrinterModule,
   ],
   controllers: [AppController],
   providers: [AppService],
