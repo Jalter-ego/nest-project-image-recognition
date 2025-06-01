@@ -54,8 +54,9 @@ export class AttentionHourService {
       }
     }).then(attentioHours=>{
       return attentioHours.map(ah =>({
+        id: ah.id,
         days: ah.days,
-        starTime: ah.startTime.toISOString(),
+        startTime: ah.startTime.toISOString(),
         endTime: ah.endTime.toISOString(),
         users: ah.attentionHourUsers.map(auh => auh.user)
       }))
@@ -71,7 +72,12 @@ export class AttentionHourService {
   }
 
   update(id: string, updateAttentionHourDto: UpdateAttentionHourDto) {
-    return `This action updates a #${id} attentionHour`;
+    return this.prismaService.attentionHour.update({
+      where: {
+        id: id
+      },
+      data: updateAttentionHourDto
+    });
   }
 
   remove(id: string) {

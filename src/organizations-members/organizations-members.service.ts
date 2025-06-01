@@ -61,6 +61,27 @@ export class OrganizationsMembersService {
     })
   }
 
+  findAllByUserEmail(email: string) {
+    return this.prismaService.organizationMember.findMany({
+      where: {
+        user: {
+          email: email
+        }
+      },
+      include: {
+        organization: {
+          include: {
+            subscriptions: {
+              include: {
+                plan: true
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
   findOne(id: string) {
     return this.prismaService.organizationMember.findFirst({
       where:{
