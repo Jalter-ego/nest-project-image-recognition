@@ -38,6 +38,13 @@ export class OrganizationsMembersService {
     return this.prismaService.organizationMember.findMany({
       where:{
         organizationId:organizationId
+      },
+      include:{
+        user:{
+          select:{
+            email:true
+          }
+        }  
       }
     })
   }
