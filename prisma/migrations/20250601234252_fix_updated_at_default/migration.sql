@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "AttentionHour" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "OrganizationMember" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "Treatment" ALTER COLUMN "updatedAt" SET DEFAULT CURRENT_TIMESTAMP;
