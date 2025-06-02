@@ -40,11 +40,20 @@ export class TreatmentsController {
   })
   @ApiQuery({ name: 'userId', description: 'id del usuario' })
   @ApiQuery({ name: 'orgId', description: 'id de la organizacion' })
+  @ApiQuery({
+    name: 'include',
+    description: 'boolean para que incluya datos mas a fondo',
+  })
   findByUserAndOrg(
     @Query('userId') userId: string,
     @Query('orgId') orgId: string,
+    @Query('include') include: boolean,
   ) {
-    return this.treatmentsService.findAllByUserAndOrganization(userId, orgId);
+    return this.treatmentsService.findAllByUserAndOrganization(
+      userId,
+      orgId,
+      include,
+    );
   }
 
   @Get('by-pat-org')
@@ -53,11 +62,16 @@ export class TreatmentsController {
   })
   @ApiQuery({ name: 'patId', description: 'id del paciente' })
   @ApiQuery({ name: 'orgId', description: 'id de la organizacion' })
+  @ApiQuery({
+    name: 'include',
+    description: 'boolean para que incluya datos mas a fondo',
+  })
   findByPatientAndOrg(
     @Query('patId') patId: string,
     @Query('orgId') orgId: string,
+    @Query('include') include: boolean,
   ) {
-    return this.treatmentsService.findAllByPatientAndOrganization(patId, orgId);
+    return this.treatmentsService.findAllByPatientAndOrganization(patId, orgId, include );
   }
 
   @Get(':id')

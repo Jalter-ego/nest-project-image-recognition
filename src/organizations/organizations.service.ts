@@ -40,6 +40,16 @@ export class OrganizationsService {
       where: {
         id: id,
       },
+      include:{
+        subscriptions:{
+          where:{
+            isActive:true
+          },
+          include:{
+            plan:true
+          }
+        }
+      }
     });
   }
 

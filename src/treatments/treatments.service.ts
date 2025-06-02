@@ -9,7 +9,7 @@ export class TreatmentsService {
 
   create(createTreatmentDto: CreateTreatmentDto) {
     return this.prismaService.treatment.create({
-      data:createTreatmentDto
+      data: createTreatmentDto,
     });
   }
 
@@ -17,88 +17,104 @@ export class TreatmentsService {
     return this.prismaService.treatment.findMany();
   }
 
-  findAllByOrganization(id:string){
+  findAllByOrganization(id: string) {
     return this.prismaService.treatment.findMany({
-      where:{
-        organizationId: id
+      where: {
+        organizationId: id,
       },
-      include:{
-        consultations:true
-      }
-    })
+      include: {
+        consultations: true,
+      },
+    });
   }
 
-  findAllByUserAndOrganization(userId: string,organizationId:string){
-    return this.prismaService.treatment.findMany({
-      where:{
+  findAllByUserAndOrganization(
+    userId: string,
+    organizationId: string,
+    inc: boolean,
+  ) {
+    const query: any = {
+      where: {
         organizationId: organizationId,
-        consultations:{
-          some:{
-            consultation:{
-              userId: userId
-            }
-          }
-        }
+        consultations: {
+          some: {
+            consultation: {
+              userId: userId,
+            },
+          },
+        },
       },
-      include:{
-        consultations:{
-          include:{
-            consultation:{
-              select:{
+    };
+
+    if (inc) {
+      query.include = {
+        consultations: {
+          include: {
+            consultation: {
+              select: {
                 id: true,
                 consultationDate: true,
                 motivo: true,
-                patient:{
-                  select:{
-                    name:true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
+                patient: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    }
+
+    return this.prismaService.treatment.findMany(query);
   }
 
-  findAllByPatientAndOrganization(patientId: string,organizationId:string){
-    return this.prismaService.treatment.findMany({
-      where:{
+  findAllByPatientAndOrganization(
+    patientId: string,
+    organizationId: string,
+    inc: boolean,
+  ) {
+    const query: any = {
+      where: {
         organizationId: organizationId,
-        consultations:{
-          some:{
-            consultation:{
-              patientId: patientId
-            }
-          }
-        }
+        consultations: {
+          some: {
+            consultation: {
+              patientId: patientId,
+            },
+          },
+        },
       },
-      include:{
-        consultations:{
-          include:{
-            consultation:{
-              select:{
+    };
+    if (inc) {
+      query.include = {
+        consultations: {
+          include: {
+            consultation: {
+              select: {
                 id: true,
                 consultationDate: true,
                 motivo: true,
-                patient:{
-                  select:{
-                    name:true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
+                patient: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    }
+    return this.prismaService.treatment.findMany(query);
   }
 
   findOne(id: string) {
     return this.prismaService.treatment.findFirst({
-      where:{
-        id:id
-      }
+      where: {
+        id: id,
+      },
     });
   }
 
@@ -108,9 +124,9 @@ export class TreatmentsService {
 
   remove(id: string) {
     return this.prismaService.treatment.delete({
-      where:{
-        id:id
-      }
+      where: {
+        id: id,
+      },
     });
   }
 }

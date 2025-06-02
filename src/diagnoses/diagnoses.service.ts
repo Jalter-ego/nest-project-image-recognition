@@ -38,70 +38,78 @@ export class DiagnosesService {
     });
   }
 
-  findAllByUserAndOrganization(userId: string,organizationId:string){
-    return this.prismaService.diagnosis.findMany({
-      where:{
+  findAllByUserAndOrganization(userId: string,organizationId:string,inc:boolean){
+    const query: any = {
+      where: {
         organizationId: organizationId,
-        consultations:{
-          some:{
-            consultation:{
-              userId: userId
-            }
-          }
-        }
+        consultations: {
+          some: {
+            consultation: {
+              userId: userId,
+            },
+          },
+        },
       },
-      include:{
-        consultations:{
-          include:{
-            consultation:{
-              select:{
+    };
+
+    if (inc) {
+      query.include = {
+        consultations: {
+          include: {
+            consultation: {
+              select: {
                 id: true,
                 consultationDate: true,
                 motivo: true,
-                patient:{
-                  select:{
-                    name:true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
+                patient: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    }
+
+    return this.prismaService.diagnosis.findMany(query);
   }
 
-  findAllByPatientAndOrganization(patientId: string,organizationId:string){
-    return this.prismaService.diagnosis.findMany({
-      where:{
+  findAllByPatientAndOrganization(patientId: string,organizationId:string,inc:boolean){
+    const query: any = {
+      where: {
         organizationId: organizationId,
-        consultations:{
-          some:{
-            consultation:{
-              patientId: patientId
-            }
-          }
-        }
+        consultations: {
+          some: {
+            consultation: {
+              patientId: patientId,
+            },
+          },
+        },
       },
-      include:{
-        consultations:{
-          include:{
-            consultation:{
-              select:{
+    };
+    if (inc) {
+      query.include = {
+        consultations: {
+          include: {
+            consultation: {
+              select: {
                 id: true,
                 consultationDate: true,
                 motivo: true,
-                patient:{
-                  select:{
-                    name:true
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    })
+                patient: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    }
+    return this.prismaService.diagnosis.findMany(query);
   }
 
   findOne(id: string) {
