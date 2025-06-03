@@ -29,7 +29,7 @@ export class ReportsController {
 
       res.status(HttpStatus.OK).set({
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="treatments-report-${new Date().toISOString()}.pdf"`,
+        'Content-Disposition': `attachment; filename="treatments-report.pdf"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'
