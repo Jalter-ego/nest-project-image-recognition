@@ -22,8 +22,9 @@ export class AuthService {
         password: signInDto.password,
       });
     }
+    const userFind = await this.usersService.findOneEmail(signInDto.email)
 
-    const payload = { email: signInDto.email };
+    const payload = { user: userFind };
     return { access_token: await this.jwtService.signAsync(payload) };
   }
 
