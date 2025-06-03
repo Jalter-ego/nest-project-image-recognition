@@ -89,6 +89,12 @@ export class ConsultationsController {
     return this.consultationsService.findAllByPatient(id)
   }
 
+  @Get('patient/:id/history')
+  @ApiParam({name:"id del paciente"})
+  findAllDetailedByPatient(@Param('id') id:string){
+    return this.consultationsService.findAllDetailedByPatient(id)
+  }
+
   @Get(':id')
   @ApiParam({name:"id de la consulta"})
   findOne(@Param('id') id: string) {

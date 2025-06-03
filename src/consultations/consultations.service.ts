@@ -140,6 +140,74 @@ export class ConsultationsService {
     })
   }
 
+  async findAllDetailedByPatient(id: string) {
+    const patient = await this.prismaService.patient.findFirst({
+      where: {
+        id: id
+      },
+      select: {
+        id: true,
+        name: true,
+        aPaternal: true,
+        aMaternal: true,
+        ci: true,
+        sexo: true,
+        email: true,
+        phone: true,
+        birthDate: true
+      }
+    });
+
+    if (!patient) {
+      throw new NotFoundException("Paciente no encontrado");
+    }
+
+    const consultations = await this.prismaService.consultation.findMany({
+      where: {
+        patientId: id
+      },
+      omit: {
+        patientId: true,
+        organizationId: true,
+        userId: true
+      },
+      include: {
+        treatments: {
+          omit: {
+            consultationId: true,
+            treatmentId: true
+          },
+          include: {
+            treatment: true
+          }
+        },
+        diagnoses: {
+          omit: {
+            consultationId: true,
+            diagnosisId: true
+          },
+          include: {
+            diagnosis: true
+          }   
+        },
+        user: {
+          select: {
+            id: true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        consultationDate: 'desc'
+      }
+    });
+
+    return {
+      patient,
+      consultations
+    };
+  }
+
   findOne(id: string) {
     return this.prismaService.consultation.findFirst({
       where:{
