@@ -18,10 +18,10 @@ export class ReportsService {
         const safeFilters: FilterTreatmentsDto = {
             patId: filters.patId,
             orgId: filters.orgId,
-            frequencyUnit: filters.frequencyUnit, // Keep undefined, don't convert to null
-            minApplications: filters.minApplications, // Keep undefined
-            startDate: filters.startDate, // Keep undefined
-            endDate: filters.endDate, // Keep undefined
+            frequencyUnit: filters.frequencyUnit,
+            minApplications: filters.minApplications,
+            startDate: filters.startDate,
+            endDate: filters.endDate,
         };
 
         try {
@@ -135,7 +135,7 @@ export class ReportsService {
             // Generate PDF document
             return this.printerService.createPdf(docDefinition);
         } catch (error) {
-            throw new Error(`Failed to fetch treatments: ${error.message}`);
+            throw new Error(`Failed to fetch treatments or generate PDF: ${error.message}`);
         }
     }
 }

@@ -13,9 +13,14 @@ const fonts = {
 
 @Injectable()
 export class PrinterService {
-    private printer = new PdfPrinter(fonts);
-    createPdf(docDefinition: TDocumentDefinitions){
-        return this.printer.createPdfKitDocument(docDefinition);
-    }
-}
+  private printer = new PdfPrinter(fonts);
 
+  createPdf(docDefinition: TDocumentDefinitions) {
+    try {
+      const pdfDoc = this.printer.createPdfKitDocument(docDefinition, {});
+      return pdfDoc;
+    } catch (error) {
+      throw new Error(`Failed to create PDF document: ${error.message}`);
+    }
+  }
+}
