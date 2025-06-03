@@ -7,7 +7,7 @@ import { ReportsService } from './reports.service';
 @ApiTags('reports')
 @Controller('reports')
 export class ReportsController {
-  constructor(private readonly reportsService: ReportsService) {}
+  constructor(private readonly reportsService: ReportsService) { }
 
   @Post('filterTreatments')
   @ApiOperation({
@@ -26,17 +26,15 @@ export class ReportsController {
   async findFilteredByPatientAndOrg(@Body() filterDto: FilterTreatmentsDto, @Res() res: Response) {
     try {
       const pdfDoc = await this.reportsService.findFilteredByPatientAndOrg(filterDto);
-      
-      // Set response headers for PDF download
-      res.set({
+
+      res.status(HttpStatus.OK).set({
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="treatments-report.pdf"`,
+        'Content-Disposition': `attachment; filename="treatments-report-${new Date().toISOString()}.pdf"`,
         'Cache-Control': 'no-cache, no-store, must-revalidate',
         'Pragma': 'no-cache',
         'Expires': '0'
       });
 
-      // Pipe the PDF document to the response
       pdfDoc.pipe(res);
       pdfDoc.end();
     } catch (error) {
