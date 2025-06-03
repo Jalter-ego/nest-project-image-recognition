@@ -73,8 +73,8 @@ model OrganizationMember {
   userId         String
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @default(now()) @updatedAt
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  user           User         @relation(fields: [userId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id],onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id],onDelete: Cascade)
 
   @@unique([organizationId, userId])
 }
@@ -92,7 +92,7 @@ model Patient {
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
   organizationId String
-  organization   Organization         @relation(fields: [organizationId], references: [id])
+  organization   Organization         @relation(fields: [organizationId], references: [id],onDelete: Cascade)
   consultations  Consultation[]
   appointments   MedicalAppointment[]
 
@@ -107,7 +107,7 @@ model AttentionHour {
   organizationId     String
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now()) @updatedAt
-  organization       Organization        @relation(fields: [organizationId], references: [id])
+  organization       Organization        @relation(fields: [organizationId], references: [id],onDelete: Cascade)
   attentionHourUsers AttentionHourUser[]
 }
 
@@ -115,7 +115,7 @@ model AttentionHourUser {
   userId          String
   attentionHourId String
   user            User          @relation(fields: [userId], references: [id])
-  attentionHour   AttentionHour @relation(fields: [attentionHourId], references: [id])
+  attentionHour   AttentionHour @relation(fields: [attentionHourId], references: [id],onDelete: Cascade)
 
   @@id([userId, attentionHourId])
 }
@@ -126,7 +126,7 @@ model MedicalAppointment {
   patientId           String
   organizationId      String
   patient             Patient      @relation(fields: [patientId], references: [id])
-  organization        Organization @relation(fields: [organizationId], references: [id])
+  organization        Organization @relation(fields: [organizationId], references: [id],onDelete: Cascade)
 }
 
 model Diagnosis {
@@ -135,7 +135,7 @@ model Diagnosis {
   description    String
   creationDate   DateTime                @default(now())
   organizationId String
-  organization   Organization            @relation(fields: [organizationId], references: [id])
+  organization   Organization            @relation(fields: [organizationId], references: [id],onDelete: Cascade)
   consultations  ConsultationDiagnosis[]
 }
 
@@ -149,7 +149,7 @@ model Treatment {
   organizationId String
   createdAt      DateTime                @default(now())
   updatedAt      DateTime                @default(now()) @updatedAt
-  organization   Organization            @relation(fields: [organizationId], references: [id])
+  organization   Organization            @relation(fields: [organizationId], references: [id],onDelete: Cascade)
   consultations  ConsultationTreatment[]
 }
 
@@ -167,8 +167,8 @@ model Consultation {
   organizationId   String
   patientId        String
   userId           String
-  organization     Organization            @relation(fields: [organizationId], references: [id])
-  patient          Patient                 @relation(fields: [patientId], references: [id])
+  organization     Organization            @relation(fields: [organizationId], references: [id],onDelete: Cascade)
+  patient          Patient                 @relation(fields: [patientId], references: [id],onDelete: Cascade)
   user             User                    @relation(fields: [userId], references: [id])
   diagnoses        ConsultationDiagnosis[]
   treatments       ConsultationTreatment[]
@@ -177,7 +177,7 @@ model Consultation {
 model ConsultationDiagnosis {
   consultationId String
   diagnosisId    String
-  consultation   Consultation @relation(fields: [consultationId], references: [id])
+  consultation   Consultation @relation(fields: [consultationId], references: [id],onDelete: Cascade)
   diagnosis      Diagnosis    @relation(fields: [diagnosisId], references: [id])
 
   @@id([consultationId, diagnosisId])
@@ -186,7 +186,7 @@ model ConsultationDiagnosis {
 model ConsultationTreatment {
   consultationId String
   treatmentId    String
-  consultation   Consultation @relation(fields: [consultationId], references: [id])
+  consultation   Consultation @relation(fields: [consultationId], references: [id],onDelete: Cascade)
   treatment      Treatment    @relation(fields: [treatmentId], references: [id])
 
   @@id([consultationId, treatmentId])
