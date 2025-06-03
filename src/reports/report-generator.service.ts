@@ -29,7 +29,7 @@ export class ReportGeneratorService {
 
         return {
             pageSize: 'A4',
-            pageMargins: [40, 60, 40, 60], // Margins: [left, top, right, bottom]
+            pageMargins: [40, 60, 40, 60],
             header: {
                 columns: [
                     { image: 'src/assets/logo.png', width: 80 },
