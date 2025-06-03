@@ -27,6 +27,11 @@ export class OrganizationsMembersController {
     return this.organizationsMembersService.findAllByUser(id)
   }
 
+  @Get('user/email/:email')
+  findAllByUserEmail(@Param('email') email: string) {
+    return this.organizationsMembersService.findAllByUserEmail(email);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.organizationsMembersService.findOne(id);
