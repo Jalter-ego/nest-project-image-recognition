@@ -120,8 +120,17 @@ export class DiagnosesService {
     });
   }
 
-  update(id: string, updateDiagnosisDto: UpdateDiagnosisDto) {
-    return `This action updates a #${id} diagnosis`;
+  async update(id: string, updateDiagnosisDto: UpdateDiagnosisDto) {
+    const diagnose = await this.findOne(id)
+    if (!diagnose) {
+      return { alert: 'Diagnostico no encontrado' };
+    }
+    return this.prismaService.diagnosis.update({
+      where: {
+        id: id,
+      },
+      data: updateDiagnosisDto,
+    })
   }
 
   remove(id: string) {
