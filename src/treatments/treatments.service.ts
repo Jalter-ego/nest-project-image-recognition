@@ -118,8 +118,18 @@ export class TreatmentsService {
     });
   }
 
-  update(id: string, updateTreatmentDto: UpdateTreatmentDto) {
-    return `This action updates a #${id} treatment`;
+  async  update(id: string, updateTreatmentDto: UpdateTreatmentDto) {
+    const treatment = await this.findOne(id)
+    if (!treatment) {
+      throw new Error('Treatment not found');
+    }
+    
+    return this.prismaService.treatment.update({
+      where: {
+        id: id,
+      },
+      data: updateTreatmentDto,
+    });
   }
 
   remove(id: string) {
