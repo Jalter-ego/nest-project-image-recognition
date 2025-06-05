@@ -47,7 +47,7 @@ model Subscription {
   organizationId String
   planId         String
   plan           Plan         @relation(fields: [planId], references: [id])
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id],onDelete: Cascade)
   startDate      DateTime
   endDate        DateTime
   modelUsesCount Int          @default(0)
