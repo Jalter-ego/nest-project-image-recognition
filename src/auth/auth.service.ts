@@ -1,10 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
-import * as bcryptjs from 'bcryptjs';
 import { SignInDto, SignInPatientDto } from './signInDto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Organization } from 'generated/prisma';
 
 @Injectable()
 export class AuthService {
@@ -22,7 +20,7 @@ export class AuthService {
         password: signInDto.password,
       });
     }
-    const userFind = await this.usersService.findOneEmail(signInDto.email)
+    const userFind = await this.usersService.findOneEmail(signInDto.email);
 
     const payload = { user: userFind };
     return { access_token: await this.jwtService.signAsync(payload) };
@@ -35,26 +33,24 @@ export class AuthService {
         email: signInPatientDto.email,
       },
     });
-    
-    if(patients.length === 0)
-      return {msg:"paciente no existe"}
 
-    const organizations: Organization[] = [];
-    patients.forEach(async (patient) => {
-      const organizacion = await this.prismaService.organization.findFirst({
-        where: {
-          id: patient.organizationId,
-        },
-      });
-      if (organizacion) {
-        organizations.push(organizacion);
-      }
-    });
+    if (patients.length === 0) return { msg: 'paciente no existe' };
+
+    const organizations = await Promise.all(
+      patients.map((patient) =>
+        this.prismaService.organization.findFirst({
+          where: { id: patient.organizationId },
+        }),
+      ),
+    );
 
     const payload = {
       patient: patients[0],
       organizations: organizations,
     };
+
+    console.log('Payload:', payload);
+
     return { access_token: await this.jwtService.signAsync(payload) };
   }
 }
