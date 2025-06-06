@@ -178,7 +178,7 @@ model ConsultationDiagnosis {
   consultationId String
   diagnosisId    String
   consultation   Consultation @relation(fields: [consultationId], references: [id],onDelete: Cascade)
-  diagnosis      Diagnosis    @relation(fields: [diagnosisId], references: [id])
+  diagnosis      Diagnosis    @relation(fields: [diagnosisId], references: [id],onDelete: Cascade)
 
   @@id([consultationId, diagnosisId])
 }
@@ -187,7 +187,7 @@ model ConsultationTreatment {
   consultationId String
   treatmentId    String
   consultation   Consultation @relation(fields: [consultationId], references: [id],onDelete: Cascade)
-  treatment      Treatment    @relation(fields: [treatmentId], references: [id])
+  treatment      Treatment    @relation(fields: [treatmentId], references: [id],onDelete: Cascade)
 
   @@id([consultationId, treatmentId])
 }
