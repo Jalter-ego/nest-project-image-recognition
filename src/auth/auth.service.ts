@@ -37,15 +37,21 @@ export class AuthService {
     if (patients.length === 0) return { msg: 'paciente no existe' };
 
     const organizations = await Promise.all(
-      patients.map((patient) =>
-        this.prismaService.organization.findFirst({
+      patients.map(async (patient) => {
+        const organizacion = await this.prismaService.organization.findFirst({
           where: { id: patient.organizationId },
-        }),
-      ),
+        });
+        if (!organizacion) {
+          throw new UnauthorizedException('Organización no encontrada');
+        }
+        return {
+          ...organizacion,
+          patientId: patient.id,
+        };
+      }),
     );
 
     const payload = {
-      patient: patients[0],
       organizations: organizations,
     };
 
