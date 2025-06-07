@@ -54,7 +54,12 @@ export class OrganizationsService {
   }
 
   update(id: string, updateOrganizationDto: UpdateOrganizationDto) {
-    return `This action updates a #${id} organization`;
+    return this.prismaService.organization.update({
+      where: {
+        id: id,
+      },
+      data: updateOrganizationDto,
+    });
   }
 
   remove(id: string) {
