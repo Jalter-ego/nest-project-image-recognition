@@ -12,6 +12,7 @@ import { PatientsModule } from './patients/patients.module';
 import { PlansModule } from './plans/plans.module';
 import { PrinterModule } from './printer/printer.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ReportHistoryModule } from './reports/history/report-history.module';
 import { ReportsModule } from './reports/treatment/reports.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { TreatmentsModule } from './treatments/treatments.module';
@@ -33,6 +34,7 @@ import { UsersModule } from './users/users.module';
     SubscriptionsModule,
     AttentionHourModule,
     ReportsModule,
+    ReportHistoryModule,
     PrinterModule,
   ],
   controllers: [AppController],
