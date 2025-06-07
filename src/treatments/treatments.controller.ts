@@ -1,21 +1,21 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
   Query,
 } from '@nestjs/common';
-import { TreatmentsService } from './treatments.service';
+import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CreateTreatmentDto } from './dto/create-treatment.dto';
 import { UpdateTreatmentDto } from './dto/update-treatment.dto';
-import { ApiBody, ApiOperation, ApiParam, ApiQuery } from '@nestjs/swagger';
+import { TreatmentsService } from './treatments.service';
 
 @Controller('treatments')
 export class TreatmentsController {
-  constructor(private readonly treatmentsService: TreatmentsService) {}
+  constructor(private readonly treatmentsService: TreatmentsService) { }
 
   @Post()
   @ApiBody({ type: CreateTreatmentDto })
@@ -71,7 +71,7 @@ export class TreatmentsController {
     @Query('orgId') orgId: string,
     @Query('include') include: boolean,
   ) {
-    return this.treatmentsService.findAllByPatientAndOrganization(patId, orgId, include );
+    return this.treatmentsService.findAllByPatientAndOrganization(patId, orgId, include);
   }
 
   @Get(':id')
@@ -92,5 +92,10 @@ export class TreatmentsController {
   @ApiParam({ name: 'id', description: 'id del tratamiento' })
   remove(@Param('id') id: string) {
     return this.treatmentsService.remove(id);
+  }
+
+  @Get('reminders/patient/:patientId')
+  async getRemindersForPatient(@Param('patientId') patientId: string) {
+    return this.treatmentsService.getRemindersForPatient(patientId);
   }
 }
