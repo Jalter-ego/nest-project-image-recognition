@@ -2,9 +2,16 @@ import { IsString, IsDate } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateAppointmentDto {
+  @IsString()
+  date: string;
+
   @IsDate()
   @Type(() => Date)
-  appointmentDateTime: Date;
+  startTime: Date;
+
+  @IsDate()
+  @Type(() => Date)
+  endTime: Date;
 
   @IsString()
   patientId: string;

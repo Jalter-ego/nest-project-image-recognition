@@ -121,10 +121,12 @@ model AttentionHourUser {
 }
 
 model MedicalAppointment {
-  id                  String       @id @default(cuid())
-  appointmentDateTime DateTime
-  patientId           String
-  organizationId      String
+  id             String       @id @default(cuid()) 
+  date           String    
+  startTime      DateTime     
+  endTime        DateTime    
+  patientId      String
+  organizationId String
   patient             Patient      @relation(fields: [patientId], references: [id])
   organization        Organization @relation(fields: [organizationId], references: [id],onDelete: Cascade)
 }

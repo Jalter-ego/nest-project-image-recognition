@@ -1,4 +1,5 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {Injectable,ConflictException,NotFoundException,BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
@@ -7,12 +8,26 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 export class AppointmentsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createAppointmentDto: CreateAppointmentDto) {
-    // Verificar si el paciente pertenece a la organización
+  async create(dto: CreateAppointmentDto) {
+    if (dto.startTime >= dto.endTime) {
+      throw new BadRequestException('La hora de inicio debe ser menor a la de fin');
+    }
+
+    const [year, month, day] = dto.date.split('-').map(Number);
+    const appointmentDate = new Date(year, month - 1, day);
+    appointmentDate.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (appointmentDate < today) {
+      throw new BadRequestException('No se puede agendar citas en fechas pasadas');
+    }
+
     const patient = await this.prisma.patient.findFirst({
       where: {
-        id: createAppointmentDto.patientId,
-        organizationId: createAppointmentDto.organizationId,
+        id: dto.patientId,
+        organizationId: dto.organizationId,
       },
     });
 
@@ -20,34 +35,35 @@ export class AppointmentsService {
       throw new NotFoundException('El paciente no pertenece a esta organización');
     }
 
-    // Verificar si ya existe una cita en la misma fecha y hora
-    const existingAppointment = await this.prisma.medicalAppointment.findFirst({
+    const overlapping = await this.prisma.medicalAppointment.findFirst({
       where: {
-        AND: [
+        organizationId: dto.organizationId,
+        date: dto.date,
+        OR: [
           {
-            appointmentDateTime: createAppointmentDto.appointmentDateTime,
-          },
-          {
-            organizationId: createAppointmentDto.organizationId,
+            startTime: { lt: dto.endTime },
+            endTime: { gt: dto.startTime },
           },
         ],
       },
     });
 
-    if (existingAppointment) {
-      throw new ConflictException('Ya existe una cita programada para esta fecha y hora');
+    if (overlapping) {
+      throw new ConflictException('Ya existe una cita en ese rango de horario');
     }
 
     return this.prisma.medicalAppointment.create({
       data: {
-        appointmentDateTime: createAppointmentDto.appointmentDateTime,
-        patientId: createAppointmentDto.patientId,
-        organizationId: createAppointmentDto.organizationId,
+        date: dto.date,
+        startTime: dto.startTime,
+        endTime: dto.endTime,
+        patientId: dto.patientId,
+        organizationId: dto.organizationId,
       },
       include: {
         patient: true,
-        organization: true
-      }
+        organization: true,
+      },
     });
   }
 
@@ -55,11 +71,12 @@ export class AppointmentsService {
     return this.prisma.medicalAppointment.findMany({
       include: {
         patient: true,
-        organization: true
+        organization: true,
       },
-      orderBy: {
-        appointmentDateTime: 'asc'
-      }
+      orderBy: [
+        { date: 'asc' },
+        { startTime: 'asc' },
+      ],
     });
   }
 
@@ -70,11 +87,12 @@ export class AppointmentsService {
       },
       include: {
         patient: true,
-        organization: true
+        organization: true,
       },
-      orderBy: {
-        appointmentDateTime: 'asc'
-      }
+      orderBy: [
+        { date: 'asc' },
+        { startTime: 'asc' },
+      ],
     });
   }
 
@@ -85,31 +103,41 @@ export class AppointmentsService {
       },
       include: {
         patient: true,
-        organization: true
+        organization: true,
       },
-      orderBy: {
-        appointmentDateTime: 'asc'
-      }
+      orderBy: [
+        { date: 'asc' },
+        { startTime: 'asc' },
+      ],
     });
   }
 
-  findOne(id: string) {
-    return this.prisma.medicalAppointment.findUnique({
+  async findOne(id: string) {
+    const appointment = await this.prisma.medicalAppointment.findUnique({
       where: { id },
       include: {
         patient: true,
-        organization: true
-      }
+        organization: true,
+      },
     });
+
+    if (!appointment) {
+      throw new NotFoundException('Cita no encontrada');
+    }
+
+    return appointment;
   }
 
-  async update(id: string, updateAppointmentDto: UpdateAppointmentDto) {
-    // Si se está actualizando el paciente, verificar que pertenezca a la organización
-    if (updateAppointmentDto.patientId) {
+  async update(id: string, dto: UpdateAppointmentDto) {
+    if (dto.startTime && dto.endTime && dto.startTime >= dto.endTime) {
+      throw new BadRequestException('La hora de inicio debe ser menor a la de fin');
+    }
+
+    if (dto.patientId && dto.organizationId) {
       const patient = await this.prisma.patient.findFirst({
         where: {
-          id: updateAppointmentDto.patientId,
-          organizationId: updateAppointmentDto.organizationId,
+          id: dto.patientId,
+          organizationId: dto.organizationId,
         },
       });
 
@@ -118,42 +146,47 @@ export class AppointmentsService {
       }
     }
 
-    // Si se está actualizando la fecha y hora, verificar duplicados
-    if (updateAppointmentDto.appointmentDateTime) {
-      const existingAppointment = await this.prisma.medicalAppointment.findFirst({
+    if (dto.date && dto.startTime && dto.endTime && dto.organizationId) {
+      const overlapping = await this.prisma.medicalAppointment.findFirst({
         where: {
-          AND: [
+          organizationId: dto.organizationId,
+          date: dto.date,
+          id: { not: id },
+          OR: [
             {
-              appointmentDateTime: updateAppointmentDto.appointmentDateTime,
-            },
-            {
-              organizationId: updateAppointmentDto.organizationId,
-            },
-            {
-              id: { not: id }, // Excluir la cita actual
+              startTime: { lt: dto.endTime },
+              endTime: { gt: dto.startTime },
             },
           ],
         },
       });
 
-      if (existingAppointment) {
-        throw new ConflictException('Ya existe una cita programada para esta fecha y hora');
+      if (overlapping) {
+        throw new ConflictException('Ya existe una cita en ese rango de horario');
       }
     }
 
     return this.prisma.medicalAppointment.update({
       where: { id },
-      data: updateAppointmentDto,
+      data: dto,
       include: {
         patient: true,
-        organization: true
-      }
+        organization: true,
+      },
     });
   }
 
-  remove(id: string) {
+  async remove(id: string) {
+    const appointment = await this.prisma.medicalAppointment.findUnique({
+      where: { id },
+    });
+
+    if (!appointment) {
+      throw new NotFoundException('Cita no encontrada');
+    }
+
     return this.prisma.medicalAppointment.delete({
-      where: { id }
+      where: { id },
     });
   }
 }
