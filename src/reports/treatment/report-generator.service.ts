@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
-import { OrganizationsService } from '../organizations/organizations.service';
-import { PatientsService } from '../patients/patients.service';
+import { OrganizationsService } from '../../organizations/organizations.service';
+import { PatientsService } from '../../patients/patients.service';
 import { FilterTreatmentsDto } from './dto/filter_treatments.dto';
 import { FormattedTreatment } from './types/treatment.type';
 

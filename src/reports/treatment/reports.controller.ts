@@ -1,7 +1,7 @@
 import { Body, Controller, HttpStatus, Post, Res } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { FilterTreatmentsDto } from '../reports/dto/filter_treatments.dto';
+import { FilterTreatmentsDto } from './dto/filter_treatments.dto';
 import { ReportsService } from './reports.service';
 
 @ApiTags('reports')

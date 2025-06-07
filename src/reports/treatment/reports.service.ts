@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { PrinterService } from '../printer/printer.service';
-import { FilterTreatmentsDto } from '../reports/dto/filter_treatments.dto';
-import { FormattedTreatment, RawTreatmentResult } from '../reports/types/treatment.type';
+import { PrinterService } from '../../printer/printer.service';
+import { FilterTreatmentsDto } from './dto/filter_treatments.dto';
 import { ReportGeneratorService } from './report-generator.service';
+import { FormattedTreatment, RawTreatmentResult } from './types/treatment.type';
 
 @Injectable()
 export class ReportsService {

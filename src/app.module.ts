@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { PlansModule } from './plans/plans.module';
-import { OrganizationsModule } from './organizations/organizations.module';
-import { OrganizationsMembersModule } from './organizations-members/organizations-members.module';
-import { PatientsModule } from './patients/patients.module';
 import { AppointmentsModule } from './appointments/appointments.module';
-import { DiagnosesModule } from './diagnoses/diagnoses.module';
-import { TreatmentsModule } from './treatments/treatments.module';
-import { ConsultationsModule } from './consultations/consultations.module';
-import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { AttentionHourModule } from './attention-hour/attention-hour.module';
-import { ReportsModule } from './reports/reports.module';
+import { AuthModule } from './auth/auth.module';
+import { ConsultationsModule } from './consultations/consultations.module';
+import { DiagnosesModule } from './diagnoses/diagnoses.module';
+import { OrganizationsMembersModule } from './organizations-members/organizations-members.module';
+import { OrganizationsModule } from './organizations/organizations.module';
+import { PatientsModule } from './patients/patients.module';
+import { PlansModule } from './plans/plans.module';
 import { PrinterModule } from './printer/printer.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { ReportsModule } from './reports/treatment/reports.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { TreatmentsModule } from './treatments/treatments.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -38,4 +38,4 @@ import { PrinterModule } from './printer/printer.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
