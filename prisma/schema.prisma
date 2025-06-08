@@ -88,7 +88,7 @@ model Patient {
   birthDate      DateTime
   phone          Int
   email          String
-  ci             Int                  @unique
+  ci             Int                  
   createdAt      DateTime             @default(now())
   updatedAt      DateTime             @updatedAt
   organizationId String

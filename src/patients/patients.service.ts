@@ -46,7 +46,12 @@ export class PatientsService {
 
   async updateByCI(ci: number, updatePatientDto: UpdatePatientDto) {
     return this.prisma.patient.update({
-      where: { ci },
+      where: { 
+        organizationId_ci:{
+          ci:ci,
+          organizationId: updatePatientDto.organizationId as string
+        }
+       },
       data: updatePatientDto,
     });
   }
