@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
-import { PatientsService } from './patients.service';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { PatientsService } from './patients.service';
 
 @Controller('patients')
 export class PatientsController {
-  constructor(private readonly patientsService: PatientsService) {}
+  constructor(private readonly patientsService: PatientsService) { }
 
   @Post()
   create(@Body() createPatientDto: CreatePatientDto) {
@@ -33,5 +33,12 @@ export class PatientsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.patientsService.remove(id);
+  }
+  @Patch('by-ci/:ci')
+  updateByCI(
+    @Param('ci', ParseIntPipe) ci: number,
+    @Body() updatePatientDto: UpdatePatientDto,
+  ) {
+    return this.patientsService.updateByCI(ci, updatePatientDto);
   }
 }

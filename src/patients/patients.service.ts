@@ -5,7 +5,7 @@ import { UpdatePatientDto } from './dto/update-patient.dto';
 
 @Injectable()
 export class PatientsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   create(createPatientDto: CreatePatientDto) {
     return this.prisma.patient.create({
@@ -41,6 +41,13 @@ export class PatientsService {
   remove(id: string) {
     return this.prisma.patient.delete({
       where: { id },
+    });
+  }
+
+  async updateByCI(ci: number, updatePatientDto: UpdatePatientDto) {
+    return this.prisma.patient.update({
+      where: { ci },
+      data: updatePatientDto,
     });
   }
 }
