@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AddAttHourUser, CreateAttentionHourDto } from './dto/create-attention-hour.dto';
+import { AddAttHourUser, AddMultipleAttHourUsers, CreateAttentionHourDto } from './dto/create-attention-hour.dto';
 import { UpdateAttentionHourDto } from './dto/update-attention-hour.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -7,23 +7,23 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class AttentionHourService {
   constructor(
     private prismaService: PrismaService
-  ){}
+  ) { }
   create(createAttentionHourDto: CreateAttentionHourDto) {
     return this.prismaService.attentionHour.create({
-      data:createAttentionHourDto
+      data: createAttentionHourDto
     });
   }
 
-  addAttentionHourUser(addAttentionHourUser: AddAttHourUser){
+  addAttentionHourUser(addAttentionHourUser: AddAttHourUser) {
     return this.prismaService.attentionHourUser.create({
-      data:addAttentionHourUser
+      data: addAttentionHourUser
     })
   }
 
-  removeAttentionHourUser(addAttentionHourUser: AddAttHourUser){
+  removeAttentionHourUser(addAttentionHourUser: AddAttHourUser) {
     return this.prismaService.attentionHourUser.delete({
-      where:{
-        userId_attentionHourId:{
+      where: {
+        userId_attentionHourId: {
           attentionHourId: addAttentionHourUser.attentionHourId,
           userId: addAttentionHourUser.userId
         }
@@ -35,25 +35,25 @@ export class AttentionHourService {
     return this.prismaService.attentionHour.findMany();
   }
 
-  findAllByOrganization(id:string){
+  findAllByOrganization(id: string) {
     return this.prismaService.attentionHour.findMany({
-      where:{
-        organizationId:id
+      where: {
+        organizationId: id
       },
-      include:{
-        attentionHourUsers:{
-          include:{
-            user:{
-              select:{
-                id:true,
-                email:true,
+      include: {
+        attentionHourUsers: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
               }
             }
           }
         }
       }
-    }).then(attentioHours=>{
-      return attentioHours.map(ah =>({
+    }).then(attentioHours => {
+      return attentioHours.map(ah => ({
         id: ah.id,
         days: ah.days,
         startTime: ah.startTime.toISOString(),
@@ -65,8 +65,8 @@ export class AttentionHourService {
 
   findOne(id: string) {
     return this.prismaService.attentionHour.findFirst({
-      where:{
-        id:id
+      where: {
+        id: id
       }
     });
   }
@@ -82,8 +82,56 @@ export class AttentionHourService {
 
   remove(id: string) {
     return this.prismaService.attentionHour.delete({
-      where:{
-        id:id
+      where: {
+        id: id
+      }
+    });
+  }
+
+  async addMultipleAttentionHourUsers(addMultipleAttHourUsers: AddMultipleAttHourUsers) {
+    const { userIds, attentionHourId } = addMultipleAttHourUsers;
+
+    const createPromises = userIds.map(userId =>
+      this.prismaService.attentionHourUser.create({
+        data: {
+          userId,
+          attentionHourId
+        }
+      })
+    );
+
+    return Promise.all(createPromises);
+  }
+
+  async removeMultipleAttentionHourUsers(addMultipleAttHourUsers: AddMultipleAttHourUsers) {
+    const { userIds, attentionHourId } = addMultipleAttHourUsers;
+
+    const deletePromises = userIds.map(userId =>
+      this.prismaService.attentionHourUser.delete({
+        where: {
+          userId_attentionHourId: {
+            attentionHourId,
+            userId
+          }
+        }
+      })
+    );
+
+    return Promise.all(deletePromises);
+  }
+
+  async getUsersByAttentionHour(attentionHourId: string) {
+    return this.prismaService.attentionHourUser.findMany({
+      where: {
+        attentionHourId
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+          }
+        }
       }
     });
   }
