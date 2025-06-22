@@ -34,3 +34,16 @@ export class AddAttHourUser {
     @IsNotEmpty()
     attentionHourId: string
 }
+
+export class AddMultipleAttHourUsers {
+    @ApiProperty({ example: ["cdcdcdc333...", "cdcdcdc334..."] })
+    @IsArray()
+    @IsString({ each: true })
+    @IsNotEmpty()
+    userIds: string[]
+
+    @ApiProperty({ example: "cdcdcdc333..." })
+    @IsString()
+    @IsNotEmpty()
+    attentionHourId: string
+}

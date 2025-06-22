@@ -1,1 +1,5 @@
-export class Patient {}
+export class Patient {
+  chronicDiseases?: string[];
+  allergies?: string[];
+  bloodType?: string;
+}

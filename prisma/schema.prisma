@@ -95,7 +95,9 @@ model Patient {
   organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   consultations  Consultation[]
   appointments   MedicalAppointment[]
-
+  chronicDiseases   String[]
+  allergies         String[]
+  bloodType         String?
   @@unique([organizationId, ci])
 }
 

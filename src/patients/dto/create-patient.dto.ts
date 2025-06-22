@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDate, IsInt, IsEmail } from 'class-validator';
+import { IsString, IsOptional, IsDate, IsInt, IsEmail, IsArray } from 'class-validator';
 import { Type } from 'class-transformer'; 
 
 export class CreatePatientDto {
@@ -31,4 +31,18 @@ export class CreatePatientDto {
 
   @IsString()
   organizationId: string;
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  chronicDiseases?: string[];
+
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  allergies?: string[];
+
+  @IsString()
+  @IsOptional()
+  bloodType?: string;
 }

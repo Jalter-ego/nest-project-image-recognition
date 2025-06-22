@@ -154,7 +154,10 @@ export class ConsultationsService {
         sexo: true,
         email: true,
         phone: true,
-        birthDate: true
+        birthDate: true,
+        chronicDiseases: true,
+        allergies: true,
+        bloodType: true,
       }
     });
 
