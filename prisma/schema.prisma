@@ -81,26 +81,39 @@ model OrganizationMember {
 }
 
 model Patient {
-  id             String               @id @default(cuid())
-  name           String
-  aPaternal      String?
-  aMaternal      String?
-  sexo           String
-  birthDate      DateTime
-  phone          Int
-  email          String
-  ci             Int                  
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  organizationId String
-  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  consultations  Consultation[]
-  appointments   MedicalAppointment[]
-  chronicDiseases   String[]
-  allergies         String[]
-  bloodType         String?
-  medicalReports MedicalReport[]
+  id              String               @id @default(cuid())
+  name            String
+  aPaternal       String?
+  aMaternal       String?
+  sexo            String
+  birthDate       DateTime
+  phone           Int
+  email           String
+  ci              Int
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  organizationId  String
+  organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  consultations   Consultation[]
+  appointments    MedicalAppointment[]
+  chronicDiseases String[]
+  allergies       String[]
+  bloodType       String?
+  medicalReports  MedicalReport[]
+  deviceTokens    DeviceToken[]
+
   @@unique([organizationId, ci])
+}
+
+model DeviceToken {
+  id        String   @id @default(cuid())
+  patientId String
+  patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([patientId, token])
 }
 
 model AttentionHour {
@@ -200,16 +213,16 @@ model ConsultationTreatment {
 }
 
 model MedicalReport {
-  id             String      @id @default(cuid())
+  id             String   @id @default(cuid())
   patientId      String
   organizationId String
   fecha          DateTime
   informe        String
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-  patient        Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  patient      Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 enum AuthProvider {

@@ -46,13 +46,26 @@ export class PatientsService {
 
   async updateByCI(ci: number, updatePatientDto: UpdatePatientDto) {
     return this.prisma.patient.update({
-      where: { 
-        organizationId_ci:{
-          ci:ci,
+      where: {
+        organizationId_ci: {
+          ci: ci,
           organizationId: updatePatientDto.organizationId as string
         }
-       },
+      },
       data: updatePatientDto,
+    });
+  }
+
+  async registerDeviceToken(patientId: string, fcmToken: string) {
+    return this.prisma.deviceToken.upsert({
+      where: {
+        patientId_token: { patientId, token: fcmToken },
+      },
+      update: { updatedAt: new Date() },
+      create: {
+        patientId,
+        token: fcmToken,
+      },
     });
   }
 }

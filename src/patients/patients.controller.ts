@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
+import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientsService } from './patients.service';
 
@@ -40,5 +41,13 @@ export class PatientsController {
     @Body() updatePatientDto: UpdatePatientDto,
   ) {
     return this.patientsService.updateByCI(ci, updatePatientDto);
+  }
+
+  @Post('register-device-token')
+  registerDeviceToken(@Body() registerDeviceTokenDto: RegisterDeviceTokenDto) {
+    return this.patientsService.registerDeviceToken(
+      registerDeviceTokenDto.patientId,
+      registerDeviceTokenDto.fcmToken,
+    );
   }
 }
