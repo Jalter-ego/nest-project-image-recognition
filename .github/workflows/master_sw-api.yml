@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - sw-apiMore actions
+name: Build and deploy Node.js app to Azure Web App - sw-api
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --include=dev  # ¡Clave! Instala devDependencies
+        run: npm ci --include=dev
 
       - name: Build application
         run: npm run build
@@ -34,15 +34,12 @@ jobs:
       - name: Run Prisma generate
         run: npx prisma generate
 
-      - name: Create optimized deployment package
+      - name: Create deployment package
         run: |
-          zip -r release.zip \
-            dist/* \
-            package.json \
-            package-lock.json \
-            prisma/schema.prisma \
-            node_modules/.prisma \
-            -x '*.git*' '*.md' 'tests/*'
+          mkdir -p deployment-folder
+          cp -r dist/ package.json package-lock.json prisma/ deployment-folder/
+          [ -d "node_modules/.prisma" ] && cp -r node_modules/.prisma deployment-folder/node_modules/
+          cd deployment-folder && zip -r ../release.zip ./*
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -63,8 +60,10 @@ jobs:
         with:
           name: node-app
 
-      - name: Unzip artifact
-        run: unzip release.zip -d deployment-folder
+      - name: Prepare deployment
+        run: |
+          unzip release.zip -d deployment-folder
+          cd deployment-folder && npm ci --production
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -79,3 +78,4 @@ jobs:
           app-name: 'sw-api'
           slot-name: 'Production'
           package: deployment-folder
+          startup-command: 'npm run start:azure'
