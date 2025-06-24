@@ -1,61 +1,64 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and deploy NestJS to Azure Web App
+name: Build and deploy Node.js app to Azure Web App - mi-nestjs-app
 
 on:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
   workflow_dispatch:
 
 env:
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}  # Usa el secreto de GitHub
+  DATABASE_URL: ${{ secrets.DATABASE_URL }} 
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js version
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-          cache: 'npm'
+          cache: 'npm'  # ✅ Cache para instalación más rápida
 
       - name: Install dependencies
-        run: npm ci  # Más rápido y seguro que `npm install`
+        run: npm ci  # ✅ Reemplaza npm install (más seguro y rápido)
 
       - name: Build NestJS
         run: npm run build
 
-      - name: Run Prisma Generate
+      - name: Run Prisma Generate  # ✅ Nuevo paso para Prisma
         run: npx prisma generate
 
-      - name: Run Prisma Migrations (Solo en producción)
+      - name: Run Prisma Migrations (Production)  # ✅ Nuevo paso crítico
         run: npx prisma migrate deploy
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Create deployment package
-        run: zip -r release.zip ./* -x '*.git*' -x 'node_modules/**'
+        run: zip -r release.zip ./* -x '*.git*' -x 'node_modules/**'  # ✅ Excluye archivos innecesarios
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nestjs-app
+          name: nestjs-app  # ✅ Nombre más descriptivo
           path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: nestjs-app
+          name: nestjs-app  # ✅ Coincide con el nombre cambiado
 
       - name: Unzip package
         run: unzip release.zip
@@ -67,11 +70,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B267D68B6BE74C10855978E6E371F49B }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A71CDC24B17849BF887EDA69CE7976F4 }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'mi-nestjs-app'
           slot-name: 'Production'
           package: .
-          
