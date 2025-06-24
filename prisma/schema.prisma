@@ -40,6 +40,7 @@ model Organization {
   treatments     Treatment[]
   subscriptions  Subscription[]
   attentionHours AttentionHour[]
+  medicalReports MedicalReport[]
 }
 
 model Subscription {
@@ -98,6 +99,7 @@ model Patient {
   chronicDiseases   String[]
   allergies         String[]
   bloodType         String?
+  medicalReports MedicalReport[]
   @@unique([organizationId, ci])
 }
 
@@ -131,6 +133,7 @@ model MedicalAppointment {
   organizationId String
   patient        Patient      @relation(fields: [patientId], references: [id])
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  estado         String       @default("pendiente")
 }
 
 model Diagnosis {
@@ -194,6 +197,19 @@ model ConsultationTreatment {
   treatment      Treatment    @relation(fields: [treatmentId], references: [id], onDelete: Cascade)
 
   @@id([consultationId, treatmentId])
+}
+
+model MedicalReport {
+  id             String      @id @default(cuid())
+  patientId      String
+  organizationId String
+  fecha          DateTime
+  informe        String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  patient        Patient     @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 }
 
 enum AuthProvider {

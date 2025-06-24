@@ -59,6 +59,7 @@ export class AppointmentsService {
         endTime: dto.endTime,
         patientId: dto.patientId,
         organizationId: dto.organizationId,
+        estado: dto.estado ?? 'pendiente',
       },
       include: {
         patient: true,

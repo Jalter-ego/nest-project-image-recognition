@@ -18,4 +18,7 @@ export class CreateAppointmentDto {
 
   @IsString()
   organizationId: string;
+
+  @IsString()
+  estado?: string = 'pendiente';
 }
