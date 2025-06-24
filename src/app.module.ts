@@ -17,6 +17,7 @@ import { ReportsModule } from './reports/treatment/reports.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { TreatmentsModule } from './treatments/treatments.module';
 import { UsersModule } from './users/users.module';
+import { MedicalReportsModule } from './medical-reports/medical-reports.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { UsersModule } from './users/users.module';
     ReportsModule,
     ReportHistoryModule,
     PrinterModule,
+    MedicalReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
