@@ -6,7 +6,7 @@ import { NestFactory } from '@nestjs/core';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173","https://happy-dune-00983ce1e.1.azurestaticapps.net"],
     methods: ['GET', 'POST', 'PATCH', 'DELETE'], 
     allowedHeaders: ['Content-Type', 'Authorization'], 
     credentials: true, 
