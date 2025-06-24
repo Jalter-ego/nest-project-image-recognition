@@ -79,4 +79,3 @@ jobs:
           app-name: 'sw-api'
           slot-name: 'Production'
           package: deployment-folder
-          startup-command: 'npm run start:azure' 
