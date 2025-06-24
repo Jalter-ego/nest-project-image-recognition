@@ -8,7 +8,7 @@ on:
 
 env:
   NODE_ENV: production
-  DATABASE_URL: ${{ secrets.DATABASE_URL }} 
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   build:
@@ -26,7 +26,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --include=dev  
+        run: npm ci --include=dev
 
       - name: Build application
         run: npm run build
@@ -34,14 +34,12 @@ jobs:
       - name: Run Prisma generate
         run: npx prisma generate
 
-      - name: Create optimized deployment package
+      - name: Create deployment package
         run: |
           mkdir -p deployment-folder
-          cp -r dist package.json package-lock.json prisma deployment-folder/
-          if [ -d "node_modules/.prisma" ]; then
-            cp -r node_modules/.prisma deployment-folder/node_modules/
-          fi
-          zip -r release.zip deployment-folder/*
+          cp -r dist/ package.json package-lock.json prisma/ deployment-folder/
+          [ -d "node_modules/.prisma" ] && cp -r node_modules/.prisma deployment-folder/node_modules/
+          cd deployment-folder && zip -r ../release.zip ./*
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -62,9 +60,11 @@ jobs:
         with:
           name: node-app
 
-      - name: Unzip artifact
-        run: unzip release.zip -d deployment-folder
-      
+      - name: Prepare deployment
+        run: |
+          unzip release.zip -d deployment-folder
+          tree deployment-folder -L 3  # Verifica estructura
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -72,9 +72,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_EBB03E81805C432F96B3771C70004C6F }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_02AC7B80CAAA4394B588B7C6357587AA }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'sw-api'
           slot-name: 'Production'
-          package: deployment-folder  
+          package: deployment-folder
