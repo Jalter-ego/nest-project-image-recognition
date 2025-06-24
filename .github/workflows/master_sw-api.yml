@@ -8,7 +8,7 @@ on:
 
 env:
   NODE_ENV: production
-  DATABASE_URL: ${{ secrets.DATABASE_URL }}  # Asegúrate de tener este secret en GitHub
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
 jobs:
   build:
@@ -23,20 +23,19 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20.x'
-          cache: 'npm'  # Cachea dependencias para mayor velocidad
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci  # Más rápido y confiable que npm install
+        run: npm ci --include=dev  # ¡Clave! Instala devDependencies
 
       - name: Build application
-        run: npm run build
+        run: npm run build  # Ahora nest estará disponible
 
       - name: Run Prisma generate
-        run: npx prisma generate  # Genera el cliente de Prisma
+        run: npx prisma generate
 
       - name: Create optimized deployment package
         run: |
-          # Excluye archivos innecesarios (reduce el ZIP en ~90%)
           zip -r release.zip \
             dist/* \
             package.json \
@@ -79,4 +78,4 @@ jobs:
         with:
           app-name: 'sw-api'
           slot-name: 'Production'
-          package: deployment-folder  # Usa solo la carpeta optimizada
+          package: deployment-folder
