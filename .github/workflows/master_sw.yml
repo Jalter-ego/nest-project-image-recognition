@@ -35,7 +35,7 @@ jobs:
           echo "NODE_ENV=production" > .env
           echo "PORT=8080" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-          echo "FIREBASE_ADMINSDK_JSON=${{ secrets.FIREBASE_ADMINSDK_JSON }}" >> .env
+          echo "${{ secrets.FIREBASE_ADMINSDK_JSON }}" > firebase-adminsdk.json
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
@@ -46,7 +46,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Verify node_modules
-        run: ls -la node_modules | grep -E 'prisma|nestjs|reflect-metadata'
+        run: ls -la node_modules | grep -E 'prisma|nestjs|reflect-metadata|firebase-admin'
 
       - name: Clean dev dependencies
         run: npm prune --production
@@ -61,6 +61,7 @@ jobs:
             package.json
             .env
             prisma/
+            firebase-adminsdk.json
 
   deploy:
     runs-on: ubuntu-latest
