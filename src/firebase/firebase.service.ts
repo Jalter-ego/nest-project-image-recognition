@@ -6,17 +6,19 @@ import { PrismaService } from '../prisma/prisma.service';
 export class FirebaseService {
   private readonly logger = new Logger(FirebaseService.name);
 
-  constructor(private prisma: PrismaService,) {
-    const serviceAccountPath = process.env.FIREBASE_ADMINSDK_PATH;
-
-    if (!serviceAccountPath) {
-      throw new Error('FIREBASE_ADMINSDK_PATH no está definido en las variables de entorno');
+  constructor(private prisma: PrismaService) {
+    const serviceAccountJson = process.env.FIREBASE_ADMINSDK_JSON;
+  
+    if (!serviceAccountJson) {
+      throw new Error('FIREBASE_ADMINSDK_JSON no está definido en las variables de entorno');
     }
-
+  
+    const serviceAccount = JSON.parse(serviceAccountJson);
+  
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccountPath),
+      credential: admin.credential.cert(serviceAccount),
     });
-
+  
     this.logger.log('✅ Firebase Admin inicializado');
   }
 
