@@ -1,13 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { FirebaseService } from 'src/firebase/firebase.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { TreatmentsService } from 'src/treatments/treatments.service';
 import { CreateConsultationDto, CreateDiagnosisToConsultationDto, CreateTreatmentToConsultationDto } from './dto/create-consultation.dto';
 import { UpdateConsultationDto } from './dto/update-consultation.dto';
+
+interface ReminderData {
+  description: string;
+  dates: Date[];
+}
 
 @Injectable()
 export class ConsultationsService {
   constructor(private prismaService: PrismaService,
-    private readonly firebaseService: FirebaseService) { }
+    private readonly firebaseService: FirebaseService,
+    private readonly treatmentsService: TreatmentsService,
+  ) { }
 
   async create(createConsultationDto: CreateConsultationDto) {
     const user = await this.prismaService.user.findFirst({
@@ -67,6 +75,39 @@ export class ConsultationsService {
     });
 
     if (consultation?.patientId) {
+      // 🧠 Generar recordatorios
+      const reminderData = await this.treatmentsService.getRemindersForTreatment(
+        dto.treatmentId,
+        dto.consultationId,
+      );
+
+      for (const notifyAt of reminderData!.dates) {
+        const exists = await this.prismaService.reminderNotification.findFirst({
+          where: {
+            patientId: consultation.patientId,
+            treatmentId: dto.treatmentId,
+            notifyAt,
+          },
+        });
+
+        if (!exists) {
+          const offsetInMs = 4 * 60 * 60 * 1000;
+          const nowLocal = new Date(Date.now() - offsetInMs);
+          const isPast = notifyAt < nowLocal;
+
+          console.log('NotifyAt:', notifyAt.toISOString(), 'NowLocal:', nowLocal.toISOString(), 'IsPast:', isPast);
+
+          await this.prismaService.reminderNotification.create({
+            data: {
+              patientId: consultation.patientId,
+              treatmentId: dto.treatmentId,
+              notifyAt,
+              notified: isPast,
+            },
+          });
+        }
+      }
+
       await this.firebaseService.sendNotificationToPatient(
         consultation.patientId,
         '📋 Nuevo tratamiento asignado',
@@ -77,7 +118,6 @@ export class ConsultationsService {
         },
       );
     }
-
     return association;
   }
 

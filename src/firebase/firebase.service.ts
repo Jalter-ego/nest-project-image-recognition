@@ -1,6 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import * as path from 'path';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -8,12 +7,11 @@ export class FirebaseService {
   private readonly logger = new Logger(FirebaseService.name);
 
   constructor(private prisma: PrismaService,) {
-    const serviceAccountPath = path.join(
-      process.cwd(),
-      'src',
-      'firebase',
-      'dermai-a9c48-firebase-adminsdk-fbsvc-7a05a7fee2.json'
-    );
+    const serviceAccountPath = process.env.FIREBASE_ADMINSDK_PATH;
+
+    if (!serviceAccountPath) {
+      throw new Error('FIREBASE_ADMINSDK_PATH no está definido en las variables de entorno');
+    }
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccountPath),

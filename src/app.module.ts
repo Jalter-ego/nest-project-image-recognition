@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AppointmentsModule } from './appointments/appointments.module';
@@ -14,6 +15,7 @@ import { PatientsModule } from './patients/patients.module';
 import { PlansModule } from './plans/plans.module';
 import { PrinterModule } from './printer/printer.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ReminderCronModule } from './reminder-cron/reminder-cron.module';
 import { ReportHistoryModule } from './reports/history/report-history.module';
 import { ReportsModule } from './reports/treatment/reports.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
@@ -39,7 +41,9 @@ import { UsersModule } from './users/users.module';
     ReportHistoryModule,
     PrinterModule,
     MedicalReportsModule,
-    FirebaseModule
+    FirebaseModule,
+    ReminderCronModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
