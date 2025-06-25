@@ -22,10 +22,13 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci # Instala todas las dependencias (producción y desarrollo)
+        run: npm ci
 
       - name: Build application
         run: npm run build
+
+      - name: Verify build output
+        run: ls -la dist/
 
       - name: Create .env file
         run: |
@@ -40,8 +43,11 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
+      - name: Verify node_modules
+        run: ls -la node_modules | grep -E 'prisma|nestjs|reflect-metadata'
+
       - name: Clean dev dependencies
-        run: npm prune --production # Elimina devDependencies después de build y migraciones
+        run: npm prune --production
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
