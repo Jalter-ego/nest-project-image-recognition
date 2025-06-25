@@ -22,10 +22,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --production
-
-      - name: Install dev dependencies for build
-        run: npm ci --only=dev
+        run: npm ci # Instala todas las dependencias (producción y desarrollo)
 
       - name: Build application
         run: npm run build
@@ -33,7 +30,7 @@ jobs:
       - name: Create .env file
         run: |
           echo "NODE_ENV=production" > .env
-          echo "PORT=3000" >> .env
+          echo "PORT=8080" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -44,7 +41,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Clean dev dependencies
-        run: npm prune --production
+        run: npm prune --production # Elimina devDependencies después de build y migraciones
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
