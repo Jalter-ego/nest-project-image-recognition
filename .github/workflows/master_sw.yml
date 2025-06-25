@@ -22,24 +22,29 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci --production # Solo dependencias de producción
+        run: npm ci --production
 
       - name: Install dev dependencies for build
-        run: npm ci --only=dev # Instala dependencias de desarrollo solo para el build
+        run: npm ci --only=dev
 
       - name: Build application
         run: npm run build
 
-      - name: Prepare production environment
-        run: npm run prod:env # Copia .env.production a .env
+      - name: Create .env file
+        run: |
+          echo "NODE_ENV=production" > .env
+          echo "PORT=3000" >> .env
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run Prisma migrations
         run: npx prisma migrate deploy
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }} # Usa la variable de entorno de GitHub
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Clean dev dependencies
-        run: npm prune --production # Elimina dependencias de desarrollo después del build
+        run: npm prune --production
 
       - name: Upload artifact for deployment
         uses: actions/upload-artifact@v4
@@ -50,7 +55,7 @@ jobs:
             node_modules/
             package.json
             .env
-            prisma/ # Incluye el directorio de Prisma para migraciones
+            prisma/
 
   deploy:
     runs-on: ubuntu-latest
