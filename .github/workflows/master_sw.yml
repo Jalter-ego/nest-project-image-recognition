@@ -35,8 +35,10 @@ jobs:
           echo "NODE_ENV=production" > .env
           echo "PORT=8080" >> .env
           echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+          echo "FIREBASE_ADMINSDK_JSON=${{ secrets.FIREBASE_ADMINSDK_JSON }}" >> .env
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FIREBASE_ADMINSDK_JSON: ${{ secrets.FIREBASE_ADMINSDK_JSON }}
 
       - name: Run Prisma migrations
         run: npx prisma migrate deploy

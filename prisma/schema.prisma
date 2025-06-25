@@ -81,26 +81,27 @@ model OrganizationMember {
 }
 
 model Patient {
-  id              String               @id @default(cuid())
-  name            String
-  aPaternal       String?
-  aMaternal       String?
-  sexo            String
-  birthDate       DateTime
-  phone           Int
-  email           String
-  ci              Int
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime             @updatedAt
-  organizationId  String
-  organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  consultations   Consultation[]
-  appointments    MedicalAppointment[]
-  chronicDiseases String[]
-  allergies       String[]
-  bloodType       String?
-  medicalReports  MedicalReport[]
-  deviceTokens    DeviceToken[]
+  id                   String                 @id @default(cuid())
+  name                 String
+  aPaternal            String?
+  aMaternal            String?
+  sexo                 String
+  birthDate            DateTime
+  phone                Int
+  email                String
+  ci                   Int
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  organizationId       String
+  organization         Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  consultations        Consultation[]
+  appointments         MedicalAppointment[]
+  chronicDiseases      String[]
+  allergies            String[]
+  bloodType            String?
+  medicalReports       MedicalReport[]
+  deviceTokens         DeviceToken[]
+  ReminderNotification ReminderNotification[]
 
   @@unique([organizationId, ci])
 }
@@ -159,18 +160,36 @@ model Diagnosis {
   consultations  ConsultationDiagnosis[]
 }
 
+model ReminderNotification {
+  id          String   @id @default(cuid())
+  treatmentId String
+  patientId   String
+  notifyAt    DateTime
+  notified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  patient   Patient   @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  treatment Treatment @relation(fields: [treatmentId], references: [id], onDelete: Cascade)
+
+  @@index([notifyAt])
+  @@index([patientId])
+  @@index([notified])
+}
+
 model Treatment {
-  id             String                  @id @default(cuid())
-  description    String
-  duration       String
-  instructions   String
-  frequencyValue Int?
-  frequencyUnit  FrequencyUnit?
-  organizationId String
-  createdAt      DateTime                @default(now())
-  updatedAt      DateTime                @default(now()) @updatedAt
-  organization   Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  consultations  ConsultationTreatment[]
+  id                   String                  @id @default(cuid())
+  description          String
+  duration             String
+  instructions         String
+  frequencyValue       Int?
+  frequencyUnit        FrequencyUnit?
+  organizationId       String
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @default(now()) @updatedAt
+  organization         Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  consultations        ConsultationTreatment[]
+  ReminderNotification ReminderNotification[]
 }
 
 enum FrequencyUnit {

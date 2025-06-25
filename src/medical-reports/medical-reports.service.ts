@@ -1,16 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { FirebaseService } from '../firebase/firebase.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMedicalReportDto } from './dto/create-medical-report.dto';
 import { UpdateMedicalReportDto } from './dto/update-medical-report.dto';
 
 @Injectable()
 export class MedicalReportsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,
+    private readonly firebaseService: FirebaseService) { }
 
-  create(createMedicalReportDto: CreateMedicalReportDto) {
-    return this.prisma.medicalReport.create({
+  async create(createMedicalReportDto: CreateMedicalReportDto) {
+    const medicalReport = await this.prisma.medicalReport.create({
       data: createMedicalReportDto,
     });
+
+    await this.firebaseService.sendNotificationToPatient(
+      createMedicalReportDto.patientId,
+      'Nuevo informe médico disponible',
+      'Se ha creado un nuevo informe médico para ti',
+      { reportId: medicalReport.id },
+    );
+
+    return medicalReport;
   }
 
   findAll() {

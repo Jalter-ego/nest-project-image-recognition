@@ -4,6 +4,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTreatmentDto } from './dto/create-treatment.dto';
 import { UpdateTreatmentDto } from './dto/update-treatment.dto';
 
+interface ReminderData {
+  description: string;
+  dates: Date[];
+}
+
 @Injectable()
 export class TreatmentsService {
   constructor(private prismaService: PrismaService) { }
@@ -150,58 +155,87 @@ export class TreatmentsService {
 
     const numValue = parseInt(match[1]);
     const unit = match[2].toLowerCase();
-    let endDate: Date;
 
-    if (unit === 'dias') { endDate = addDays(startDate, numValue); }
-    else if (unit === 'semanas') { endDate = addDays(startDate, numValue * 7); }
-    else if (unit === 'meses') { endDate = addMonths(startDate, numValue); }
-    else { throw new Error(`Unsupported duration unit: ${unit}`); }
+    if (unit === 'dias') return addDays(startDate, numValue);
+    if (unit === 'semanas') return addDays(startDate, numValue * 7);
+    if (unit === 'meses') return addMonths(startDate, numValue);
 
-    return endDate;
+    throw new Error(`Unsupported duration unit: ${unit}`);
+  }
+
+  private generateReminderDates(
+    startDate: Date,
+    endDate: Date,
+    frequencyValue: number,
+    frequencyUnit: string,
+  ): Date[] {
+    let frequencyInHours: number;
+
+    if (frequencyUnit === 'daily') frequencyInHours = 24 / frequencyValue;
+    else if (frequencyUnit === 'weekly') frequencyInHours = 168 / frequencyValue;
+    else if (frequencyUnit === 'monthly') frequencyInHours = 730 / frequencyValue;
+    else throw new Error(`Unsupported frequency unit: ${frequencyUnit}`);
+
+    const dates: Date[] = [];
+    let currentDate = new Date(startDate);
+
+    while (isBefore(currentDate, endDate)) {
+      dates.push(new Date(currentDate));
+      currentDate = addHours(currentDate, frequencyInHours);
+    }
+
+    return dates;
+  }
+
+  async getRemindersForTreatment(treatmentId: string, consultationId: string): Promise<ReminderData | null> {
+    const consultation = await this.prismaService.consultation.findFirst({
+      where: { id: consultationId },
+    });
+
+    if (!consultation) throw new Error('Consulta no encontrada');
+
+    const treatment = await this.prismaService.treatment.findFirst({
+      where: { id: treatmentId },
+    });
+
+    if (!treatment) throw new Error('Tratamiento no encontrado');
+
+    const { frequencyValue, frequencyUnit, duration, description } = treatment;
+
+    if (!frequencyValue || !frequencyUnit) return null;
+
+    const start = consultation.consultationDate;
+    const end = this.parseDuration(duration, start);
+    const dates = this.generateReminderDates(start, end, frequencyValue, frequencyUnit);
+
+    return { description, dates };
   }
 
   async getRemindersForPatient(patientId: string) {
     const consultations = await this.prismaService.consultation.findMany({
-      where: {
-        patientId,
-      },
+      where: { patientId },
       include: {
         treatments: { include: { treatment: true } },
       },
     });
+
     const remindersByTreatment: { [key: string]: { description: string; dates: Date[] } } = {};
 
     for (const consultation of consultations) {
       const consultationDate = consultation.consultationDate;
 
-      for (const consultationTreatment of consultation.treatments) {
-        const treatment = consultationTreatment.treatment;
-        const { frequencyValue, frequencyUnit, duration, description, instructions } = treatment;
+      for (const { treatment } of consultation.treatments) {
+        const { frequencyValue, frequencyUnit, duration, description } = treatment;
 
-        if (!frequencyValue || !frequencyUnit) { continue; }
+        if (!frequencyValue || !frequencyUnit) continue;
 
-        const endTreatmentDate = this.parseDuration(duration, consultationDate);
+        const endDate = this.parseDuration(duration, consultationDate);
+        const dates = this.generateReminderDates(consultationDate, endDate, frequencyValue, frequencyUnit);
 
-        let frequencyInHours: number;
-        if (frequencyUnit === 'daily') { frequencyInHours = frequencyValue * 24; }
-        else if (frequencyUnit === 'weekly') { frequencyInHours = frequencyValue * 24 * 7; }
-        else if (frequencyUnit === 'monthly') { frequencyInHours = frequencyValue * 730; }
-        else { continue; }
-
-        const treatmentDates: Date[] = [];
-        let currentDate = new Date(consultationDate);
-
-        while (isBefore(currentDate, endTreatmentDate)) {
-          treatmentDates.push(new Date(currentDate));
-          currentDate = addHours(currentDate, frequencyInHours);
-        }
-
-        remindersByTreatment[treatment.id] = {
-          description,
-          dates: treatmentDates,
-        };
+        remindersByTreatment[treatment.id] = { description, dates };
       }
     }
+
     return remindersByTreatment;
   }
 }
