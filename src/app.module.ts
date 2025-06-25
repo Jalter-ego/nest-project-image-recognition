@@ -6,6 +6,8 @@ import { AttentionHourModule } from './attention-hour/attention-hour.module';
 import { AuthModule } from './auth/auth.module';
 import { ConsultationsModule } from './consultations/consultations.module';
 import { DiagnosesModule } from './diagnoses/diagnoses.module';
+import { FirebaseModule } from './firebase/firebase.module';
+import { MedicalReportsModule } from './medical-reports/medical-reports.module';
 import { OrganizationsMembersModule } from './organizations-members/organizations-members.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { PatientsModule } from './patients/patients.module';
@@ -17,7 +19,6 @@ import { ReportsModule } from './reports/treatment/reports.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { TreatmentsModule } from './treatments/treatments.module';
 import { UsersModule } from './users/users.module';
-import { MedicalReportsModule } from './medical-reports/medical-reports.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { MedicalReportsModule } from './medical-reports/medical-reports.module';
     ReportHistoryModule,
     PrinterModule,
     MedicalReportsModule,
+    FirebaseModule
   ],
   controllers: [AppController],
   providers: [AppService],
