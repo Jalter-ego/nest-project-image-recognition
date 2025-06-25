@@ -183,9 +183,9 @@ export class TreatmentsService {
         const endTreatmentDate = this.parseDuration(duration, consultationDate);
 
         let frequencyInHours: number;
-        if (frequencyUnit === 'daily') { frequencyInHours = frequencyValue * 24; }
-        else if (frequencyUnit === 'weekly') { frequencyInHours = frequencyValue * 24 * 7; }
-        else if (frequencyUnit === 'monthly') { frequencyInHours = frequencyValue * 730; }
+        if (frequencyUnit === 'daily') { frequencyInHours = 24 / frequencyValue; }
+        else if (frequencyUnit === 'weekly') { frequencyInHours = 168 / frequencyValue; }
+        else if (frequencyUnit === 'monthly') { frequencyInHours = 730 / frequencyValue; }
         else { continue; }
 
         const treatmentDates: Date[] = [];
